@@ -10,7 +10,9 @@
     "build": "webpack -p",
     "start": "node server/server.js",
     "seed": "node --max_old_space_size=16296 db/seeder.js && node --max_old_space_size=16296 db/seeder2.js",
-    "loader": "psql < db/schema.sql"
+    "loader": "psql < db/schema.sql",
+    "mongoloader": "mongoimport --db nikeshoes --collection shoeinfos --type csv --columnsHaveTypes --fields 'id.string(),shoeID.string(),shoeName.string(),shoeColors.string(),price.string(),shoeLine.string(),shoeType.string(), image.string()' --file records3.csv && mongoimport --db nikeshoes --collection shoeinfos --type csv --columnsHaveTypes --fields 'id.string(),shoeID.string(),shoeName.string(),shoeColors.string(),price.string(),shoeLine.string(),shoeType.string(), image.string()' --file records2.csv",
+    "build:server": "NODE_ENV=development webpack --config webpack.server.js --mode=development -w"
   },
   "repository": {
     "type": "git",
@@ -40,7 +42,9 @@
     "lodash": "^4.17.11",
     "mongoose": "^5.3.8",
     "morgan": "^1.9.1",
+    "newrelic": "^4.11.0",
     "path": "^0.12.7",
+    "pg": "^7.6.1",
     "prop-types": "^15.6.2",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
@@ -66,6 +70,7 @@
     "sinon": "^7.1.1",
     "style-loader": "^0.23.1",
     "webpack": "^4.23.1",
-    "webpack-cli": "^3.1.2"
+    "webpack-cli": "^3.1.2",
+    "webpack-node-externals": "^1.7.2"
   }
 }

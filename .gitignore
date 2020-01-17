@@ -1,11 +1,13 @@
 # DO NOT INCLUDE node_modules
 node_modules
-records1.csv
-records2.csv
-records3.csv
+*.csv
+.python-version
+get-pip.py
+shoes.pem
 
 # IGNORE webpack bundle
 /public/n&c_bundle.js
+/server-build/index.js
 
 # INGORE coverage folder
 /coverage

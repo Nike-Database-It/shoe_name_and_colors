@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import 'regenerator-runtime/runtime';
 
-import Name from './Name';
-import ColorsGrid from './ColorsGrid';
+import Name from './Name.jsx';
+import ColorsGrid from './ColorsGrid.jsx';
 
 const axios = require('axios');
 
@@ -31,13 +31,13 @@ class App extends React.Component {
 
   async findShoeInformation(shoeID) {
     let info = await axios.get(`/:${shoeID}/colors`);
-    [info] = info.data;
+    info = info.data;
     const newState = {};
     newState.shoeID = shoeID;
-    newState.name = info.shoeName;
-    newState.colors = info.shoeColors;
+    newState.name = info.shoename;
+    newState.colors = info.shoecolors;
     newState.price = info.price;
-    newState.shoeType = info.shoeLine;
+    newState.shoeType = info.productline;
     this.setState(newState);
   }
 

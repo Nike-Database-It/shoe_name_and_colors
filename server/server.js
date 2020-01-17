@@ -1,11 +1,25 @@
 const express = require('express');
-
 const parser = require('body-parser');
 const morgan = require('morgan');
-const compression = require('compression');
 const path = require('path');
+const compression = require('compression');
 
-const Shoe = require('../db/shoeTitle');
+process.env.UV_THREADPOOL_SIZE = 10;
+
+// const Shoe = require('../db/shoeTitle');
+const { Client, Pool } = require('pg');
+
+const client = new Client({
+  user: 'neilvodoor',
+  database: 'nike',
+  password: 'charizard',
+  host: 'localhost',
+  port: "5432",
+})
+
+client.connect();
+
+const cache = {};
 
 const app = express();
 
@@ -16,47 +30,67 @@ app.use(parser.json());
 app.use(compression());
 
 // SERVER REQUEST METHODS
+// app.get('/*', (req, res) => {
+//   const application = ReactDOMServer.renderToString(<App />);
+
+//   const indexFile = path.resolve('./public/index.html');
+//   fs.readFile(indexFile, 'utf8', (err, data) => {
+//     if (err) {
+//       console.log('Error here: ', err);
+//       res.status(500).send('Bad Request.');
+//     } else {
+//       res.send(data.replace(`<div id='colors-container'></div>`, `<div id='colors-container'>${application}</div>`));
+//     }
+//   })
+// })
+
 app.get('/:shoeID/colors', ({ params }, res) => {
   const id = params.shoeID.slice(1);
-  Shoe.find({ shoeID: id }, (err, shoe) => {
-    if (err) {
-      console.log(err);
-      res.end();
-    } else {
-      res.send(shoe);
-    }
-  });
+  const query = {
+    text: 'SELECT * FROM shoes WHERE id = $1',
+    values: [id],
+  };
+  if (cache[id]) {
+    res.send(cache[id]);
+  } else {
+    client.query(query)
+      .then((resp) => {
+        cache[id] = resp.rows[0];
+        res.send(resp.rows[0]);
+      })
+      .catch((e) => {
+        res.send(e);
+      });
+  }
+
 });
 
 app.get('/:shoeID/colors/:style', ({ params }, res) => {
   const style = params.style.slice(1);
-  Shoe.find({ shoeType: style }, (err, shoes) => {
-    if (err) {
-      console.log(err);
-      res.end();
-    } else {
-      const images = [];
-      for (let i = 0; i < shoes.length; i += 1) {
-        const tuple = [];
-        tuple.push(shoes[i].shoeID);
-        tuple.push(shoes[i].image);
-        images.push(tuple);
-      }
-      res.send(images);
-    }
-  });
+
+  const query = {
+    text: 'SELECT * FROM shoes where type = $1',
+    values: [style],
+  };
+  client.query(query)
+    .then((resp) => {
+      res.send(resp.rows);
+    })
+    .catch((e) => {
+      res.send(e);
+    });
 });
 
 app.post('/new/shoe', (req, res) => {
   const values = req.body; 
 
-  let shoe = new Shoe({
+  const shoe = new Shoe({
     shoeName: values.name,
     shoeColors: values.color,
     price: values.price,
     shoeLine: values.shoeline,
     image: values.image,
-    shoeType: values.shoetype
+    shoeType: values.shoetype,
   })
 
   shoe.save((err, data) => {
@@ -79,7 +113,7 @@ app.delete('/:shoeID', ({ params }, res) => {
   })
 });
 
-app.update('/:shoeID', (res, req) => {
+app.put('/:shoeID', (res, req) => {
   const shoeID = req.params.shoeID.slice(1);
   const values = req.body;
 

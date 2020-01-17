@@ -6,8 +6,8 @@ const ColorsRow = ({
 }) => (
   <div className="color_row" id={`row_${row}`}>
     {images.map((image, i) => (
-      <div role="presentation" className={`shoe_color_option col_${i} ${curShoe === i ? 'curShoe' : ''}`} key={`row_${i + 1}`} onClick={() => { changeShoe(image[0]); }}>
-        <img src={image[1]} alt="Not found" className={`shoe_color_image ${curShoe === i ? 'curShoe_img' : ''}`} />
+      <div role="presentation" className={`shoe_color_option col_${i} ${curShoe === i ? 'curShoe' : ''}`} key={`row_${i + 1}`} onClick={() => { changeShoe(image.id); }}>
+        <img src={image.image} alt="Not found" className={`shoe_color_image ${curShoe === i ? 'curShoe_img' : ''}`} />
       </div>
     ))}
   </div>

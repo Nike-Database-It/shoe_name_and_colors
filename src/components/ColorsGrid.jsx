@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import 'regenerator-runtime/runtime';
 
-import ColorsRow from './ColorsRow';
+import ColorsRow from './ColorsRow.jsx';
 
 const axios = require('axios');
 const _ = require('lodash');
@@ -32,7 +32,8 @@ class ColorsGrid extends React.Component {
       }
     }
     const { curShoe } = this.props;
-    const data = await axios.get(`/:${curShoe}/colors/:${ids[0].split('-')[0]}`);
+    const id = ids.split('-');
+    const data = await axios.get(`/:${curShoe}/colors/:${id[0]}`);
     newState.images = _.chunk(data.data, 5);
     this.setState(newState);
   }
